@@ -1,0 +1,15 @@
+node_modules/
+.nuxt/
+.output/
+dist/
+.DS_Store
+
+backend/venv/
+backend/.env
+backend/data/passwords.csv
+backend/data/xato-net-10-million-passwords.txt
+backend/data/hashes.txt
+backend/ml/password-model.xgb
+
+__pycache__/
+*.pyc

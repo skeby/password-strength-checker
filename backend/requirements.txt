@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+httpx
+anthropic
+python-dotenv
+xgboost
+scikit-learn
+zxcvbn
+skl2onnx
+onnxmltools
+onnxruntime
+pydantic
+pandas
+numpy
+joblib
