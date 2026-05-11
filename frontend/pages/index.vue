@@ -44,10 +44,10 @@
 
             <button
               class="mt-5 w-full rounded-2xl border border-[#d4b36a80] bg-gradient-to-r from-[#b78f41] to-[#f2d08c] px-4 py-3.5 text-base font-bold text-[#16120a] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="!password.length || isStreaming"
+              :disabled="!password.length || isStreaming || analyseMutation.isPending.value"
               @click="runAdvice"
             >
-              {{ isStreaming ? "Generating advice..." : "Check password" }}
+              {{ isStreaming ? "Generating advice..." : analyseMutation.isPending.value ? "Analysing..." : "Check password" }}
             </button>
 
             <p v-if="modelError" class="mt-3 text-sm text-red-300">
@@ -154,10 +154,11 @@ watch(
     breachDebounce.value = setTimeout(async () => {
       const fullHash = await sha1(value)
       const hashPrefix = fullHash.slice(0, 5)
-      const result = await analyseMutation.mutateAsync({ hashPrefix })
+      const hashSuffix = fullHash.slice(5)
+      const result = await analyseMutation.mutateAsync({ hashPrefix, hashSuffix })
       isBreached.value = result.isBreached
       breachCount.value = result.breachCount
-    }, 400)
+    }, 600)
   },
   { immediate: true }
 )

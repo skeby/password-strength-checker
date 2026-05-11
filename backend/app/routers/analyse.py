@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/api/analyse", response_model=AnalyseResponse)
 async def analyse_password(request: AnalyseRequest) -> AnalyseResponse:
     try:
-        is_breached, breach_count = await check_pwned_password(request.hashPrefix)
+        is_breached, breach_count = await check_pwned_password(request.hashPrefix, request.hashSuffix)
     except HTTPError as error:
         raise HTTPException(status_code=502, detail="HIBP lookup failed") from error
 

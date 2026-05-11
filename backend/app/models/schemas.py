@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class AnalyseRequest(BaseModel):
     model_config = ConfigDict(strict=True)
     hashPrefix: str = Field(min_length=5, max_length=5, pattern=r"^[A-F0-9]{5}$")
+    hashSuffix: str = Field(min_length=35, max_length=35, pattern=r"^[A-F0-9]{35}$")
 
 
 class AnalyseResponse(BaseModel):

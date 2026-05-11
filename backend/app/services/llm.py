@@ -6,11 +6,25 @@ from groq import AsyncGroq
 from app.models.schemas import AdviseRequest
 
 
-SYSTEM_PROMPT = """You are a concise password security advisor. You will be given a structured
-analysis of a password. Your job is to explain in plain English — in 2 to 3
-sentences — why the password is strong or weak, and give exactly one specific,
-actionable suggestion. Do not repeat raw numbers. Do not use jargon. Do not
-be alarmist. End with the suggestion on a new line prefixed with "Suggestion:"."""
+SYSTEM_PROMPT = """You are a password security advisor. You will receive a structured analysis
+of a password including expert suggestions from the zxcvbn library.
+
+Your task:
+1. Synthesize the data into a 2-3 sentence explanation of why the password is strong or weak
+2. Review the zxcvbn suggestions and refine them—make them more specific and actionable if possible
+3. Add your own suggestions if the zxcvbn suggestions are incomplete
+4. Present 1-3 clear, specific suggestions the user can implement immediately
+
+Do not repeat raw numbers or be alarmist. Use plain English. 
+
+IMPORTANT: Format your response with suggestions on new lines like this:
+
+[Your 2-3 sentence explanation here]
+
+Suggestions:
+- [Suggestion 1]
+- [Suggestion 2 (if applicable)]
+- [Suggestion 3 (if applicable)]"""
 
 
 def _detected_patterns(payload: AdviseRequest) -> str:
@@ -36,15 +50,21 @@ def build_user_prompt(payload: AdviseRequest) -> str:
         if payload.isBreached
         else "false"
     )
+    
+    suggestions_text = ""
+    if payload.suggestions:
+        suggestions_text = "\n- zxcvbn suggestions: " + ", ".join(payload.suggestions)
+    
     return f"""Password analysis:
 - Strength score: {payload.strengthScore}/100 (from ML model)
 - zxcvbn score: {payload.zxcvbnScore}/4
 - Estimated crack time: {payload.crackTime}
-- zxcvbn warning: "{payload.warning}"
+- zxcvbn warning: "{payload.warning}"{suggestions_text}
 - Patterns detected: {_detected_patterns(payload)}
 - Policy rules passed: {payload.rulesPassed}/{payload.rulesTotal}
 - Found in known breaches: {breached_text}
-Give your explanation now."""
+
+Based on this analysis, provide your assessment and refined suggestions."""
 
 
 async def stream_advice(payload: AdviseRequest) -> AsyncIterator[str]:
@@ -64,6 +84,7 @@ async def stream_advice(payload: AdviseRequest) -> AsyncIterator[str]:
     async for chunk in stream:
         text = chunk.choices[0].delta.content if chunk.choices else None
         if text:
-            yield f"data: {text}\n\n"
+            formatted_text = text.replace("\n", "\ndata: ")
+            yield f"data: {formatted_text}\n\n"
 
     yield "data: [DONE]\n\n"

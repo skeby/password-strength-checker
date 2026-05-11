@@ -24,7 +24,7 @@ const parseSseChunk = (chunk: string): string => {
     .split("\n")
     .filter((line) => line.startsWith("data:"))
     .map((line) => line.slice(5).replace(/^ /, ""))
-    .join("")
+    .join("\n")
 }
 
 export const useAdvise = () => {

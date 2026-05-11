@@ -1,22 +1,23 @@
-import { useMutation } from "@tanstack/vue-query"
+import { useMutation } from "@tanstack/vue-query";
 
 interface AnalyseRequest {
-  hashPrefix: string
+  hashPrefix: string;
+  hashSuffix: string;
 }
 
 interface AnalyseResponse {
-  isBreached: boolean
-  breachCount: number
+  isBreached: boolean;
+  breachCount: number;
 }
 
 export const useAnalyse = () => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
 
   return useMutation<AnalyseResponse, Error, AnalyseRequest>({
     mutationFn: async (payload) =>
       $fetch(`${config.public.backendBaseUrl}/api/analyse`, {
         method: "POST",
-        body: payload
-      })
-  })
-}
+        body: payload,
+      }),
+  });
+};
