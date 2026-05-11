@@ -25,11 +25,15 @@ body,
 body {
   margin: 0;
   color: var(--mist);
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
   background:
     radial-gradient(1200px 500px at 10% -20%, rgba(212, 179, 106, 0.12), transparent 70%),
     radial-gradient(900px 450px at 110% 10%, rgba(84, 154, 222, 0.12), transparent 70%),
     linear-gradient(160deg, #0a0a0d 0%, #12121a 45%, #0f1118 100%);
+}
+
+.display-font {
+  font-family: "Cormorant Garamond", Georgia, serif;
 }
 
 .grain-overlay::before {

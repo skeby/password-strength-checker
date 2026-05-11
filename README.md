@@ -22,7 +22,7 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-# add your ANTHROPIC_API_KEY to .env
+# add your GROQ_API_KEY to .env
 uvicorn app.main:app --reload --port 8000
 
 # Frontend
@@ -33,6 +33,7 @@ npm run dev
 
 # ML training (optional — a pre-trained model is not included)
 cd backend
+pip install -r ml/requirements.txt
 python ml/train.py    # requires data/passwords.csv
 python ml/export.py   # exports ONNX to frontend/public/model/
 ```
@@ -40,6 +41,7 @@ python ml/export.py   # exports ONNX to frontend/public/model/
 ## Security notes
 
 - Raw passwords are never sent to the backend.
-- Backend secrets are loaded from `.env`.
+- Backend secrets are loaded from `.env` (`GROQ_API_KEY`).
 - CORS origins are controlled by `ALLOWED_ORIGINS`.
 - HIBP uses k-anonymity style range lookup with a fixed User-Agent.
+- Runtime backend dependencies are intentionally kept small for Vercel.

@@ -1,15 +1,15 @@
 <template>
   <div class="grid gap-3 sm:grid-cols-3">
-    <div class="rounded-xl border border-[#d4b36a44] bg-[#11131da6] p-3">
-      <p class="text-xs uppercase tracking-[0.16em] text-[#cbb78a]">ML score</p>
+    <div class="rounded-2xl border border-[#d4b36a33] bg-[#0b0d12] p-3">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">ML score</p>
       <p class="mt-2 text-2xl font-extrabold text-[#f3deac]">{{ mlScore }}/100</p>
     </div>
-    <div class="rounded-xl border border-[#d4b36a44] bg-[#11131da6] p-3">
-      <p class="text-xs uppercase tracking-[0.16em] text-[#cbb78a]">Crack time</p>
-      <p class="mt-2 text-sm font-medium text-[#f4f0e7]">{{ crackTime }}</p>
+    <div class="rounded-2xl border border-[#d4b36a33] bg-[#0b0d12] p-3">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">Crack time</p>
+      <p class="mt-2 text-sm font-medium leading-6 text-[#f4f0e7]">{{ crackTime }}</p>
     </div>
-    <div class="rounded-xl border border-[#d4b36a44] bg-[#11131da6] p-3">
-      <p class="text-xs uppercase tracking-[0.16em] text-[#cbb78a]">zxcvbn</p>
+    <div class="rounded-2xl border border-[#d4b36a33] bg-[#0b0d12] p-3">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">zxcvbn</p>
       <div class="mt-2 flex gap-1">
         <span
           v-for="index in 4"

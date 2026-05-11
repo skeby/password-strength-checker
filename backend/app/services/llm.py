@@ -1,7 +1,7 @@
 import os
 from collections.abc import AsyncIterator
 
-from anthropic import AsyncAnthropic
+from groq import AsyncGroq
 
 from app.models.schemas import AdviseRequest
 
@@ -48,17 +48,22 @@ Give your explanation now."""
 
 
 async def stream_advice(payload: AdviseRequest) -> AsyncIterator[str]:
-    client = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
     prompt = build_user_prompt(payload)
 
-    async with client.messages.stream(
-        model="claude-sonnet-4-20250514",
+    stream = await client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt},
+        ],
         max_tokens=220,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": prompt}],
-    ) as stream:
-        async for text in stream.text_stream:
-            if text:
-                yield f"data: {text}\n\n"
+        stream=True,
+    )
+
+    async for chunk in stream:
+        text = chunk.choices[0].delta.content if chunk.choices else None
+        if text:
+            yield f"data: {text}\n\n"
 
     yield "data: [DONE]\n\n"
