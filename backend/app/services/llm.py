@@ -7,15 +7,19 @@ from app.models.schemas import AdviseRequest
 
 
 SYSTEM_PROMPT = """You are a password security advisor. You will receive a structured analysis
-of a password including expert suggestions from the zxcvbn library.
+of a password including expert suggestions from our pattern detection engine.
 
 Your task:
 1. Synthesize the data into a 2-3 sentence explanation of why the password is strong or weak
-2. Review the zxcvbn suggestions and refine them—make them more specific and actionable if possible
-3. Add your own suggestions if the zxcvbn suggestions are incomplete
-4. Present 1-3 clear, specific suggestions the user can implement immediately
+2. Review the engine's suggestions and refine them—make them more specific and actionable if possible
+3. Add your own suggestions if the provided suggestions are incomplete
+4. Present ALL clear, specific suggestions the user can implement immediately, ensuring none are missed.
 
-Do not repeat raw numbers or be alarmist. Use plain English. 
+CRITICAL INSTRUCTIONS: 
+- Do not repeat raw numbers or be alarmist. 
+- Use simple, everyday plain English. 
+- NEVER use technical jargon like "zxcvbn", "ML model", "HIBP", "hash", or "algorithm" in your response. 
+- Speak directly to the user in a friendly, conversational tone.
 
 IMPORTANT: Format your response with suggestions on new lines like this:
 
@@ -23,8 +27,8 @@ IMPORTANT: Format your response with suggestions on new lines like this:
 
 Suggestions:
 - [Suggestion 1]
-- [Suggestion 2 (if applicable)]
-- [Suggestion 3 (if applicable)]"""
+- [Suggestion 2]
+- [Suggestion ...]"""
 
 
 def _detected_patterns(payload: AdviseRequest) -> str:
@@ -53,18 +57,18 @@ def build_user_prompt(payload: AdviseRequest) -> str:
     
     suggestions_text = ""
     if payload.suggestions:
-        suggestions_text = "\n- zxcvbn suggestions: " + ", ".join(payload.suggestions)
+        suggestions_text = "\n- System suggestions: " + ", ".join(payload.suggestions)
     
     return f"""Password analysis:
-- Strength score: {payload.strengthScore}/100 (from ML model)
-- zxcvbn score: {payload.zxcvbnScore}/4
-- Estimated crack time: {payload.crackTime}
-- zxcvbn warning: "{payload.warning}"{suggestions_text}
+- AI Assessment Score: {payload.strengthScore}/100
+- Pattern Safety Score: {payload.zxcvbnScore}/4
+- Estimated time to hack: {payload.crackTime}
+- System warning: "{payload.warning}"{suggestions_text}
 - Patterns detected: {_detected_patterns(payload)}
-- Policy rules passed: {payload.rulesPassed}/{payload.rulesTotal}
-- Found in known breaches: {breached_text}
+- Security rules passed: {payload.rulesPassed}/{payload.rulesTotal}
+- Found in known data breaches: {breached_text}
 
-Based on this analysis, provide your assessment and refined suggestions."""
+Based on this analysis, provide your simple, jargon-free assessment and refined suggestions."""
 
 
 async def stream_advice(payload: AdviseRequest) -> AsyncIterator[str]:
@@ -77,7 +81,7 @@ async def stream_advice(payload: AdviseRequest) -> AsyncIterator[str]:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ],
-        max_tokens=220,
+        max_tokens=600,
         stream=True,
     )
 

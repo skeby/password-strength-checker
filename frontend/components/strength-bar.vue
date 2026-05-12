@@ -1,15 +1,20 @@
 <template>
-  <div class="space-y-2">
-    <div class="flex items-center justify-between">
-      <p class="text-xs uppercase tracking-[0.18em] text-[#d8d0bf]">Strength</p>
-      <p class="text-sm font-semibold" :class="toneClass">{{ label }}</p>
+  <div class="space-y-3 mt-2">
+    <div class="flex items-end justify-between">
+      <p class="text-sm font-medium text-[var(--text-secondary)]">Security Rating</p>
+      <p class="text-lg font-bold transition-colors duration-300 display-font" :class="toneTextClass">{{ label }}</p>
     </div>
-    <div class="grid grid-cols-5 gap-2">
+    <div class="relative h-2.5 w-full overflow-hidden rounded-full bg-white/5 shadow-inner">
       <div
-        v-for="segment in 5"
-        :key="segment"
-        class="h-3 rounded-full border border-[#ffffff1a] transition-all duration-300"
-        :class="segment <= activeSegments ? toneClass : 'bg-[#ffffff12]'"
+        class="absolute left-0 top-0 h-full rounded-full transition-all duration-500 ease-out"
+        :class="toneBgClass"
+        :style="{ width: `${Math.max(2, score)}%` }"
+      />
+      <!-- Glow effect -->
+      <div
+        class="absolute left-0 top-0 h-full w-full rounded-full blur-md transition-all duration-500 ease-out opacity-40 mix-blend-screen"
+        :class="toneBgClass"
+        :style="{ width: `${Math.max(2, score)}%` }"
       />
     </div>
   </div>
@@ -22,7 +27,6 @@ const props = defineProps<{
   score: number
 }>()
 
-const activeSegments = computed(() => Math.max(1, Math.ceil(props.score / 20)))
 const label = computed(() => {
   if (props.score <= 20) return "Very Weak"
   if (props.score <= 40) return "Weak"
@@ -31,11 +35,19 @@ const label = computed(() => {
   return "Very Strong"
 })
 
-const toneClass = computed(() => {
-  if (props.score <= 20) return "bg-red-500 text-red-300"
-  if (props.score <= 40) return "bg-orange-500 text-orange-300"
-  if (props.score <= 60) return "bg-yellow-500 text-yellow-300"
-  if (props.score <= 80) return "bg-teal-500 text-teal-300"
-  return "bg-green-500 text-green-300"
+const toneBgClass = computed(() => {
+  if (props.score <= 20) return "bg-gradient-to-r from-red-600 to-red-400"
+  if (props.score <= 40) return "bg-gradient-to-r from-orange-600 to-orange-400"
+  if (props.score <= 60) return "bg-gradient-to-r from-amber-500 to-yellow-400"
+  if (props.score <= 80) return "bg-gradient-to-r from-blue-600 to-blue-400"
+  return "bg-gradient-to-r from-emerald-500 to-emerald-400"
+})
+
+const toneTextClass = computed(() => {
+  if (props.score <= 20) return "text-red-400"
+  if (props.score <= 40) return "text-orange-400"
+  if (props.score <= 60) return "text-amber-400"
+  if (props.score <= 80) return "text-blue-400"
+  return "text-emerald-400"
 })
 </script>

@@ -1,97 +1,90 @@
 <template>
-  <main class="relative isolate min-h-screen overflow-hidden px-4 py-6 md:px-8 md:py-10">
-    <div
-      class="pointer-events-none absolute inset-x-0 top-[-8rem] h-[28rem] bg-[radial-gradient(circle_at_top,rgba(243,222,172,0.12),transparent_55%)]"
-    />
-    <div class="mx-auto w-full max-w-7xl">
-      <header class="max-w-3xl">
-        <p class="text-xs uppercase tracking-[0.32em] text-[#cbb78a]">Security Atelier</p>
-        <h1 class="display-font mt-3 text-5xl leading-[0.95] text-[#f6e7bf] md:text-7xl">
-          Check a password in one calm step
+  <main class="relative isolate flex min-h-screen flex-col items-center justify-center px-4 py-12 md:py-24 overflow-x-hidden">
+    <div class="mx-auto w-full max-w-2xl">
+      <header class="text-center">
+        <div class="inline-flex items-center gap-2 rounded-full border border-[var(--border-light)] bg-white/5 px-4 py-1.5 backdrop-blur-sm">
+          <span class="relative flex h-2 w-2">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+          </span>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)]">Password Health Check</p>
+        </div>
+        <h1 class="display-font mt-6 text-5xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-6xl lg:text-7xl">
+          Check your password
         </h1>
-        <p class="mt-4 max-w-2xl text-base leading-7 text-[#ddd4c1] md:text-lg">
-          Type a password, get an instant strength score, a breach check, and plain-English advice.
-          Everything stays simple enough for regular use.
+        <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
+          Type a password to instantly understand its strength, check for data breaches, and get personalized advice to improve it.
         </p>
       </header>
 
-      <section class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,390px)_minmax(0,1fr)]">
-        <div class="space-y-4 self-start xl:sticky xl:top-8">
-          <section
-            class="rounded-[2rem] border border-[#d4b36a33] bg-[#0e1118e6] p-5 shadow-[0_22px_80px_-44px_rgba(243,222,172,0.4)]"
+      <div class="mt-12 space-y-8">
+        <!-- Main Input Card -->
+        <section class="relative rounded-[2rem] border border-[var(--border-light)] bg-gradient-to-b from-[var(--bg-card)] to-[var(--bg-card-hover)] p-6 shadow-2xl backdrop-blur-xl md:p-8">
+          <!-- Ambient glow behind card -->
+          <div class="pointer-events-none absolute -inset-px -z-10 rounded-[2rem] bg-gradient-to-b from-blue-500/20 to-purple-500/10 opacity-50 blur-xl transition duration-500"></div>
+          
+          <PasswordInput v-model="password" />
+
+          <div class="mt-8 transition-all duration-300" :class="{ 'opacity-50 grayscale': !password.length }">
+            <StrengthBar :score="strengthScore" />
+          </div>
+
+          <button
+            class="group mt-8 w-full overflow-hidden rounded-2xl bg-white text-base font-bold text-black transition-all hover:scale-[1.02] hover:bg-gray-100 disabled:pointer-events-none disabled:opacity-50 disabled:hover:scale-100"
+            :disabled="!password.length || isStreaming || analyseMutation.isPending.value"
+            @click="runAdvice"
           >
-            <div class="flex items-end justify-between gap-4">
-              <div>
-                <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">Password</p>
-                <p class="mt-1 text-sm leading-6 text-[#d6ccb9]">
-                  No password leaves your browser for scoring.
-                </p>
-              </div>
-              <span
-                class="rounded-full border border-[#d4b36a2a] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-[#e6d8b2]"
-              >
-                Local first
+            <div class="relative px-6 py-4">
+              <span class="relative z-10 flex items-center justify-center gap-2">
+                {{ isStreaming ? "Analyzing..." : analyseMutation.isPending.value ? "Checking databases..." : "Get personalized advice" }}
+                <svg v-if="!isStreaming && !analyseMutation.isPending.value" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
               </span>
             </div>
+          </button>
+          
+          <p v-if="modelError" class="mt-4 text-center text-sm font-medium text-red-400">
+            Error: {{ modelError }}
+          </p>
+        </section>
 
-            <div class="mt-4">
-              <PasswordInput v-model="password" />
-            </div>
+        <!-- Results Sections (Fade in when there's a password) -->
+        <Transition
+          enter-active-class="transition-all duration-500 ease-out"
+          enter-from-class="opacity-0 translate-y-4"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-300 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-4"
+        >
+          <div v-if="password.length" class="space-y-6">
+            <StatsRow
+              :ml-score="strengthScore"
+              :crack-time="zxcvbnResult.crackTime"
+              :zxcvbn-score="zxcvbnResult.score"
+            />
 
-            <div class="mt-5">
-              <StrengthBar :score="strengthScore" />
-            </div>
+            <BreachBanner :is-breached="isBreached" :breach-count="breachCount" />
 
-            <button
-              class="mt-5 w-full rounded-2xl border border-[#d4b36a80] bg-gradient-to-r from-[#b78f41] to-[#f2d08c] px-4 py-3.5 text-base font-bold text-[#16120a] transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
-              :disabled="!password.length || isStreaming || analyseMutation.isPending.value"
-              @click="runAdvice"
-            >
-              {{ isStreaming ? "Generating advice..." : analyseMutation.isPending.value ? "Analysing..." : "Check password" }}
-            </button>
+            <AdviceCard :advice-text="adviceText" :is-streaming="isStreaming" />
 
-            <p v-if="modelError" class="mt-3 text-sm text-red-300">
-              Model error: {{ modelError }}
-            </p>
-          </section>
-
-          <div class="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-            <div class="rounded-2xl border border-[#ffffff14] bg-[#0b0d12] p-4">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">Speed</p>
-              <p class="mt-2 text-sm leading-6 text-[#f2ead9]">Fast local scoring with zxcvbn and ONNX.</p>
-            </div>
-            <div class="rounded-2xl border border-[#ffffff14] bg-[#0b0d12] p-4">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">Breach</p>
-              <p class="mt-2 text-sm leading-6 text-[#f2ead9]">Server-side HIBP lookup on a hash prefix only.</p>
-            </div>
-            <div class="rounded-2xl border border-[#ffffff14] bg-[#0b0d12] p-4">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-[#cbb78a]">Advice</p>
-              <p class="mt-2 text-sm leading-6 text-[#f2ead9]">Streamed guidance with one clear next step.</p>
-            </div>
+            <details class="group mt-8 rounded-2xl border border-[var(--border-light)] bg-black/20 backdrop-blur-sm">
+              <summary class="flex cursor-pointer items-center justify-between p-5 font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]">
+                <span>View Technical Details</span>
+                <span class="transition group-open:rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <div class="p-5 pt-0">
+                <RuleChecklist :rules="policy.rules" />
+              </div>
+            </details>
           </div>
-        </div>
-
-        <div class="space-y-6">
-          <StatsRow
-            :ml-score="strengthScore"
-            :crack-time="zxcvbnResult.crackTime"
-            :zxcvbn-score="zxcvbnResult.score"
-          />
-
-          <BreachBanner :is-breached="isBreached" :breach-count="breachCount" />
-
-          <AdviceCard :advice-text="adviceText" :is-streaming="isStreaming" />
-
-          <details class="rounded-3xl border border-[#d4b36a2a] bg-[#0e1118cc] p-5">
-            <summary class="cursor-pointer list-none text-sm uppercase tracking-[0.24em] text-[#d5c293]">
-              View detailed policy checks
-            </summary>
-            <div class="mt-4">
-              <RuleChecklist :rules="policy.rules" />
-            </div>
-          </details>
-        </div>
-      </section>
+        </Transition>
+      </div>
     </div>
   </main>
 </template>

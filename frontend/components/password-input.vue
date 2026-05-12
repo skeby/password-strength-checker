@@ -1,24 +1,23 @@
 <template>
-  <div class="space-y-2">
-    <label class="text-sm uppercase tracking-[0.2em] text-[#f3deac]">Password</label>
-    <div class="relative">
+  <div class="group relative">
+    <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 blur transition duration-500 group-focus-within:opacity-100" />
+    <div class="relative flex items-center overflow-hidden rounded-2xl border border-[var(--border-light)] bg-[#0f0f13] shadow-inner transition-colors duration-300 focus-within:border-blue-500/50 focus-within:bg-[#14141a]">
       <input
         :type="isVisible ? 'text' : 'password'"
         :value="modelValue"
-        placeholder="Enter password"
+        placeholder="Type a password to test..."
         autocomplete="new-password"
-        class="w-full rounded-xl border border-[#d4b36a66] bg-[#12121ab3] px-4 py-3 pr-24 text-base text-[#f5efe0] outline-none transition focus:border-[#f3deac] focus:ring-2 focus:ring-[#d4b36a55]"
+        class="w-full bg-transparent px-5 py-4 pr-24 text-lg font-medium text-[var(--text-primary)] placeholder-[var(--text-secondary)] outline-none"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
       <button
         type="button"
-        class="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[#d4b36a66] px-2 py-1 text-xs font-semibold uppercase tracking-wide text-[#f3deac] transition hover:bg-[#d4b36a33]"
+        class="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl bg-white/5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] backdrop-blur-sm transition-colors hover:bg-white/10 hover:text-[var(--text-primary)]"
         @click="isVisible = !isVisible"
       >
         {{ isVisible ? "Hide" : "Show" }}
       </button>
     </div>
-    <p class="text-right text-xs text-[#d7cfbd]">{{ modelValue.length }} characters</p>
   </div>
 </template>
 
