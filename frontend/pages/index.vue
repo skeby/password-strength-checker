@@ -7,7 +7,7 @@
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
           </span>
-          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)]">Password Health Check</p>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-secondary)]">P@ssword</p>
         </div>
         <h1 class="display-font mt-6 text-5xl font-extrabold tracking-tight text-[var(--text-primary)] md:text-6xl lg:text-7xl">
           Check your password

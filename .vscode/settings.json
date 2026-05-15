@@ -1,0 +1,7 @@
+{
+  "python.analysis.extraPaths": ["./backend"],
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/bin/python",
+  "vue.server.cwd": "${workspaceFolder}/frontend",
+  "typescript.tsdk": "frontend/node_modules/typescript/lib",
+  "css.lint.unknownAtRules": "ignore",
+}
