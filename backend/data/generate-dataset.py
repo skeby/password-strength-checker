@@ -2,7 +2,7 @@
 import csv
 import zxcvbn as zx
 
-with open("xato-net-10-million-passwords.txt", encoding="utf-8", errors="ignore") as src, \
+with open("RockYou.txt", encoding="utf-8", errors="ignore") as src, \
      open("passwords.csv", "w", newline="") as dst:
 
     writer = csv.writer(dst)
